@@ -1,0 +1,412 @@
+openapi: '3.0.2'
+info:
+  title: MicroService Demo
+  version: '1.0'
+servers:
+  - url: http://localhost:8000
+
+# Paths -----------------------------------------------------------------------
+
+paths:
+
+  /user/signUp:
+    post:
+      tags:
+        - user
+      description: 'Add a new user'
+      operationId: signUpUser
+      responses:
+        '201':
+          description: 'user created, returns user data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignUpResponse'
+        '400':
+          description: object invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '409':
+          description: user name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: user to add
+        required: true
+
+  /user/confirmAccount:
+  # TODO: add PUT and DELETE
+    post:
+      tags:
+        - user
+      description: 'confirm a user'
+      operationId: confirmUser
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Invalid Code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmUser'
+        description: user to add
+        required: true
+
+  /user/signIn:
+    post:
+      tags:
+        - user
+      description: 'signIn a user'
+      operationId: signInUser
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInResponse'
+        '400':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInUser'
+        description: signIn a user
+        required: true
+
+  /user/getUser:
+    get:
+      tags:
+        - user
+      description: 'get a user'
+      operationId: getUser
+      parameters:
+        - name: userName
+          in: query
+          description: userName
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse'
+        '400':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/updateUser:
+    put:
+      tags:
+        - user
+      description: 'update user attributes'
+      operationId: updateUser
+      parameters:
+        - name: userName
+          in: query
+          description: userName
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateAttributes'
+        required: true
+
+  /user/deleteUser:
+    delete:
+      tags:
+        - user
+      description: 'delete user'
+      operationId: deleteUser
+      parameters:
+        - name: userName
+          in: query
+          description: userName
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/tokenValidate:
+    post:
+      tags:
+        - user
+      description: 'validate user token'
+      operationId: validateUserToken
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Token'
+        description: validate a user token
+        required: true
+
+
+
+# TODO: define paths and components for appointments, notifications, and documents
+
+# Components ------------------------------------------------------------------
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+      - name
+      - email
+      - password
+      properties:
+        name:
+          type: string
+          example: Victor
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    ConfirmUser:
+      type: object
+      required:
+      - userName
+      - code
+      properties:
+        userName:
+          type: string
+          example: Victor
+        code:
+          type: string
+    SignInUser:
+      type: object
+      required:
+      - userName
+      - password
+      properties:
+        userName:
+          type: string
+          example: Victor
+        password:
+          type: string
+          format: password
+    Token:
+      type: object
+      required:
+      - token
+      properties:
+        token:
+          type: string
+    ApiResponse:
+      type: object
+      description: response message including http status code
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+    SignUpResponse:
+      type: object
+      description: response message including http status code
+      properties:
+        username:
+          type: string
+        pool:
+          type: object
+          properties:
+            userPoolId:
+              type: string
+            clientId:
+              type: string
+            client:
+              type: object
+              properties:
+                endpoint:
+                  type: string
+                fetchOptions:
+                  type: object
+            advancedSecurityDataCollectionFlag:
+              type: boolean
+        client:
+          type: object
+          properties:
+            endpoint:
+              type: string
+            fetchOptions:
+              type: object
+        authenticationFlowType:
+          type: string
+        keyPrefix:
+          type: string
+        userDataKey:
+          type: string
+
+    SignInResponse:
+      type: object
+      description: response message including http status code
+      properties:
+        accesToken:
+          type: string
+        id_token:
+          type: string
+        refresh_token:
+          type: string
+
+    GetUserResponse:
+      type: object
+      description: response message including http status code
+      properties:
+        Username:
+          type: string
+        UserAttributes:
+          type: object
+          properties:
+            email:
+              type: string
+            gender:
+              type: string
+            address:
+              type: string
+            email_verified:
+              type: string
+
+    updateAttributes:
+      type: object
+      description: response message including http status code
+      properties:
+        gender:
+          type: string
+        address:
+          type: string
+
+
+
+
+
+
+
